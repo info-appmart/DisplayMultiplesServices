@@ -1,4 +1,4 @@
 InBillingSample
 ===============
 
-Appmartの内部課金システムサンプル
+Appmartの内部課金システムサンプルとなります。
