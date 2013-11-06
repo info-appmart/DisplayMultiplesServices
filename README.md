@@ -1,13 +1,13 @@
-# Appmartのアプリ内課金システムサンプル
+# Appmartアプリ内課金システム
 
-##複数のアイテムを取得方法
-
-
-###必要なパラメータの保存場所：
-src.jp.app_mart.billing.StoreActivity
+###複数のアイテムを取得方法
 
 
-###パラメータ一覧
+####必要なパラメータの保存場所：
+*src.jp.app_mart.billing.StoreActivity*
+
+
+####パラメータ一覧
 
 ```
 //デベロッパＩＤ
@@ -24,7 +24,7 @@ APPMART_APP_ID = "your_application_id";
 ```
 
 
-### 同ファイルのallSkuIds（配列）の中に上記アプリのサービス名を入れる：
+#### 同ファイルのallSkuIds（配列）の中に上記アプリのサービス名を入れる：
 
 ```
    private final List<String> allSkuIds = new ArrayList<String>() {
