@@ -4,5 +4,23 @@
     <string name="app_name">AppmartBilling</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="already_connected">既に接続されています。</string>
+    <string name="is_now_connected">接続完了</string>
+    <string name="is_now_deconnected">サービス切断</string>
+    <string name="appmart_not_installed">Appmartがインストールされていません</string>
+    <string name="get_information">情報取得開始</string>
+    <string name="bundle_unreachable">bundle取得失敗</string>
+    <string name="response_code_error">レスポンスコードエラー：</string>
+    <string name="product_not_purchasable">アイテム購入不可能</string>
+    <string name="failed_prepare_bill_service">内部課金：サービス設定失敗</string>
+    <string name="failed_sending_intent">intent送信失敗</string>
+    <string name="inventory_refreshed">サービス情報が更新されました</string>
+    <string name="inventory_refreshed_error">サービス情報更新失敗</string>
+    
+    <string name="inventory_refreshed_error_remote">サービス情報更新中エラーが発生しました（remote）</string>
+    <string name="inventory_refreshed_error_json">サービス情報更新中エラーが発生しました（JSON）</string>
+    <string name="get_inventory">情報取得スタート！</string>
+    <string name="encrypt_error">暗号化失敗</string>
+    
 
 </resources>

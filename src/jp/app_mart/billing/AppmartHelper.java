@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.crypto.Cipher;
 
+import jp.app_mart.sample.R;
 import jp.app_mart.service.AppmartInBillingInterface;
 
 import org.json.JSONException;
@@ -38,8 +39,10 @@ public class AppmartHelper {
     //デバッグ関係
     boolean mDebugLog = false;
     String mDebugTag = "IabHelper";
-
+    
+  
     //Appmartのリレスポンスコード    	
+    public static final String RESULT_CODE_STRING = "resultCode";
 	public static final String BILLING_APPMART_PACKAGE_NAME = "jp.app_mart";
     public static final String BILLING_APPMART_SERVICE_NAME = "jp.app_mart.service.AppmartInBillingService";
     public static final int BILLING_RESPONSE_RESULT_OK = 1;
@@ -132,7 +135,7 @@ public class AppmartHelper {
     public void startSetup(final OnAppmartSetupFinishedListener listener) {
 
         if (mSetupDone)
-            throw new IllegalStateException("既に接続されています。");
+            throw new IllegalStateException(mContext.getString(R.string.already_connected));
 
         mServiceConn = new ServiceConnection() {
 
@@ -141,7 +144,7 @@ public class AppmartHelper {
                 mService = AppmartInBillingInterface.Stub.asInterface((IBinder) boundService);
                 mSetupDone = true;
                 if (listener != null) {
-                    listener.onAppmartSetupFinished(new AppmartResult(BILLING_RESPONSE_RESULT_OK,  "接続完了"));
+                    listener.onAppmartSetupFinished(new AppmartResult(BILLING_RESPONSE_RESULT_OK,  mContext.getString(R.string.is_now_connected)));
                 }
                 
                 //決済後発信される信号をキャッチするreceiver
@@ -152,7 +155,7 @@ public class AppmartHelper {
 
             //外部サービスに切断
             public void onServiceDisconnected(ComponentName name) {
-                logDebug("サービス切断.");
+                logDebug(mContext.getString(R.string.is_now_deconnected));
                 mService = null;
             }
         };
@@ -162,12 +165,15 @@ public class AppmartHelper {
         
         //端末内にappmartがインストールされていれば、バインドする
         if (!mContext.getPackageManager().queryIntentServices(serviceIntent, 0).isEmpty()) {
+        	
             mContext.bindService(serviceIntent, mServiceConn, Context.BIND_AUTO_CREATE);
+            
         }else {
+        	
             if (listener != null) {
                 listener.onAppmartSetupFinished(
                         new AppmartResult(BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE,
-                                "appMartがインストールされていません"));
+                                mContext.getString(R.string.appmart_not_installed)));
             }
         }
     }
@@ -215,7 +221,7 @@ public class AppmartHelper {
         (new Thread(new Runnable() {
             public void run() {
             	
-                logDebug("情報取得開始" + sku);
+                logDebug(mContext.getString(R.string.get_information) + sku);
                 AppmartResult result;
 
                 try {
@@ -224,18 +230,24 @@ public class AppmartHelper {
                     Bundle bundleForPaymentInterface = mService.prepareForBillingService(mAppId, dataEncrypted);
 
                     if (bundleForPaymentInterface == null) {
-                        logError("bundle取得失敗");
+                    	
+                        logError(mContext.getString(R.string.bundle_unreachable));
+                        
                         result = new AppmartResult(APPMARTHELPER_GET_BUNDLE_FOR_PAYMENT_FAILED,
-                                "bundle取得失敗");
+                        		mContext.getString(R.string.bundle_unreachable));
+                        
                         if (listener != null)
                             listener.onAppmartPurchaseFinished(result, null);
                         return;
                     }
 
                     int response = bundleForPaymentInterface.getInt("resultCode");
+                    
                     if (response != BILLING_RESPONSE_RESULT_OK) {
-                        logError("レスポンスコードエラー： " + response);
-                        result = new AppmartResult(response, "アイテム購入不可能");
+                    	
+                        logError(mContext.getString(R.string.response_code_error) + response);
+                        result = new AppmartResult(response, mContext.getString(R.string.product_not_purchasable));
+                        
                         if (listener != null)
                             listener.onAppmartPurchaseFinished(result, null);
                         return;
@@ -246,20 +258,26 @@ public class AppmartHelper {
                     mPurchasingItemType = itemType;
                     mPurchasingSku = sku;
                     pIntent.send(context, 0, new Intent());
+                    
                 } catch (RemoteException e) {
-                    logError("Failed to prepare for billing service");
-                    e.printStackTrace();
+                	
+                    logError(mContext.getString(R.string.failed_prepare_bill_service));
+                    
                     result = new AppmartResult(APPMARTHELPER_SEND_INTENT_FAILED,
-                            "Failed to send intent");
+                            mContext.getString(R.string.failed_sending_intent));
+                    
                     if (listener != null)
-                        listener.onAppmartPurchaseFinished(result, null);
+                    listener.onAppmartPurchaseFinished(result, null);
+                    
                 } catch (PendingIntent.CanceledException e) {
-                    logError("Failed to send intent");
-                    e.printStackTrace();
+                	
+                    logError(  mContext.getString(R.string.failed_sending_intent));
+           
                     result = new AppmartResult(APPMARTHELPER_SEND_INTENT_FAILED,
-                            "Failed to send intent");
+                    		  mContext.getString(R.string.failed_sending_intent));
+                    
                     if (listener != null)
-                        listener.onAppmartPurchaseFinished(result, null);
+                    listener.onAppmartPurchaseFinished(result, null);
                 }
             }
         })).start();
@@ -384,8 +402,9 @@ public class AppmartHelper {
             public void run() {
             	
                 AppmartResult result = new AppmartResult(BILLING_RESPONSE_RESULT_OK,
-                        "Inventory refresh successful.");
+                        mContext.getString(R.string.inventory_refreshed));
                 AppmartInventory inv = null;
+                
                 try {
                     inv = queryInventory(true, moreSkus);
                 }
@@ -426,18 +445,18 @@ public class AppmartHelper {
             if (querySkuDetails) {
                 int r = querySkuDetails(inv, moreItemSkus);
                 if (r != BILLING_RESPONSE_RESULT_OK) {
-                    throw new AppmartException(r,
-                            "Error refreshing inventory (querying prices of items).");
+                    throw new AppmartException(r,mContext.getString(R.string.inventory_refreshed_error));
                 }
             }
 
             return inv;
+            
         } catch (RemoteException e) {
             throw new AppmartException(APPMARTHELPER_REMOTE_EXCEPTION,
-                    "Remote exception while refreshing inventory.", e);
+                    mContext.getString(R.string.inventory_refreshed_error_remote), e);
         } catch (JSONException e) {
             throw new AppmartException(APPMARTHELPER_BAD_RESPONSE,
-                    "Error parsing JSON response while refreshing inventory.", e);
+                    mContext.getString(R.string.inventory_refreshed_error_json), e);
         }
     }
 
@@ -451,7 +470,7 @@ public class AppmartHelper {
     int querySkuDetails(AppmartInventory inv, List<String> serviceIds) throws RemoteException,
             JSONException {
     	
-        logDebug("Querying SKU detail");
+        logDebug(mContext.getString(R.string.get_inventory));
 
         int response = BILLING_RESPONSE_RESULT_OK;
 
@@ -459,13 +478,12 @@ public class AppmartHelper {
         for (String serviceId : serviceIds) {
         	
             String json = mService.getServiceDetails(mAppId, createEncryptedData(serviceId, mDeveloperId, mLicenseKey, mSignatureBase64));
-            logDebug("情報取得： " + json);
-            
+                
             //JSON文字列のオブジェクト化
             JSONObject o = new JSONObject(json);
             
             //結果コード取得
-            int tmpResponse = Integer.valueOf(o.optString("resultCode"));
+            int tmpResponse = Integer.valueOf(o.optString(RESULT_CODE_STRING));
             if (tmpResponse != BILLING_RESPONSE_RESULT_OK) {
                 response = tmpResponse;
             }
