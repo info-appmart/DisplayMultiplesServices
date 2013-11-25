@@ -32,7 +32,7 @@ import android.widget.TextView;
 public class StoreActivity extends Activity {
 
 	//デベロッパＩＤ
-    public static final String APPMART_DEVELOPER_ID = "your_developper_id";
+    public static final String APPMART_DEVELOPER_ID = "your_developer_id";
     //ライセンスキー
     public static final String APPMART_LICENSE_KEY = "your_licence_key";
     //公開鍵
@@ -40,9 +40,7 @@ public class StoreActivity extends Activity {
     //アプリＩＤ
     public static final String APPMART_APP_ID = "your_application_id";
 
-    /*
-     * View
-     */
+    //Views
     TextView mAppmartStatusLabel;
     ListView mAddonsList;
     
@@ -55,14 +53,8 @@ public class StoreActivity extends Activity {
     //対象サービスＩＤ
     private final List<String> allSkuIds = new ArrayList<String>() {
         {
-            add("test-1");
-            add("test-2");
-            add("test-3");
-            add("test-4");
-            add("test-5");
-            add("test-6");
-            add("test-7");
-            add("test-8");
+            add("your_service_id_1");
+            add("your_service_id_2");
         }
     };
 
@@ -95,13 +87,11 @@ public class StoreActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        tearDownBilling();	//stop receiver + service
+        tearDownBilling();	//receiverとserviceを停止
     }
 
     
-    /**
-     * Appmartのヘルパーの設定
-     */
+    /* Appmartのヘルパーの設定   */
     private void setupBilling() {
 
         //Appmart helperインスタンス
@@ -129,32 +119,21 @@ public class StoreActivity extends Activity {
     }
 
     
-    /**
-     * appmartサービスを切断　  {@link #unbindService}
-     * appmartのreceiverを切断{@link #unregisterReceiver}
-     */
+    /* serviceとreceiverを停止  */
     private void tearDownBilling() {
-    	
-    	// Appmart
         if (mAppmartHelper != null) {
             try {
                 mAppmartHelper.dispose();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-        
+        }        
         mAppmartHelper = null;
         mAppmartInventory = null;
         appmartSetUpDone = false;
     }
 
-    
-
-
-    /*
-     * appmartサービス経由でサービス情報を取得
-     */
+    /* appmartサービス経由でサービス情報を取得   */
     private void queryInventoryAsync() {
 
         if (!appmartSetUpDone)
@@ -180,16 +159,13 @@ public class StoreActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
             super.onActivityResult(requestCode, resultCode, data);
     }
-        
-    /*
-     * アイテムが選択された時に実行
-     */
+    
+    /* アイテムが選択された時に実行   */
     protected void requestBilling(String sku) {
 
         int requestCode = new Random().nextInt(999999);
 
-        if (mAppmartHelper != null) {
-        	
+        if (mAppmartHelper != null) {        	
         	
             mAppmartHelper.launchPurchaseFlow(this, sku, requestCode,
                     new OnAppmartPurchaseFinishedListener() {
@@ -217,11 +193,7 @@ public class StoreActivity extends Activity {
     
     /**
      * adapter用のクラス
-     * {@link #BaseAdapter} を継承
-     * 作成者　：　@author canu
-     * 
      */
-    //@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private class ShopAdapter extends BaseAdapter {
 
         @Override
@@ -297,18 +269,13 @@ public class StoreActivity extends Activity {
         return pref.getBoolean(String.format(KEY_PURCHASE_PREFIX, sku), false);
     }
 
-    /*
-     * 情報更新
-     */
+    /* 情報更新   */
     public void refresh(View view) {
         tearDownBilling();
         setupBilling();
     }
     
-    /**
-     *　端末内の履歴情報を削除
-     * @param view
-     */
+    /*　端末内の履歴情報を削除  */
     public void deleteHistory(View view){
     	SharedPreferences pref = getSharedPreferences(PREF_KEY, MODE_PRIVATE);
         Editor editor = pref.edit();
