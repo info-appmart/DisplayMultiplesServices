@@ -304,7 +304,7 @@ public class AppmartHelper {
 						
 						//決済キー
 						String resultKeyCurrentStransaction= arg1.getExtras().getString("appmart_result_key");				
-						if (resultKeyCurrentStransaction!=null && resultKeyCurrentStransaction.equals(resultKey)){
+						if (resultKeyCurrentStransaction==null || resultKeyCurrentStransaction.equals(resultKey)){
 							
 							Thread.sleep(1000);
 	
