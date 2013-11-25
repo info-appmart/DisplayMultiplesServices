@@ -64,6 +64,7 @@ public class AppmartHelper {
     public String mLicenseKey;
     public String mSignatureBase64;
     public String mAppId;
+    public String resultKey;
 
     //aidlファイルを元に生成されたインタフェース
     public AppmartInBillingInterface mService;
@@ -252,6 +253,9 @@ public class AppmartHelper {
                             listener.onAppmartPurchaseFinished(result, null);
                         return;
                     }
+                    
+                    // 決済キーを取得
+					resultKey= bundleForPaymentInterface.getString("resultKey");
 
                     PendingIntent pIntent = bundleForPaymentInterface.getParcelable("appmart_pending_intent");
                     mPurchaseListener = listener;
@@ -285,7 +289,7 @@ public class AppmartHelper {
 
     /**
      * Broadcast Receiverクラス
-     * 購入後にメッセージが発信されるメッセージをゲット
+     * 購入後に配信されるメッセージを取得
      */
 	private class AppmartReceiver extends BroadcastReceiver {
 
@@ -294,44 +298,50 @@ public class AppmartHelper {
 
 			(new Thread(new Runnable() {
 				public void run() {
-
-					AppmartResult result;
-
+					
+					AppmartResult result;	
 					try {
-
-						Thread.sleep(1000);
-
-						// 最終確認
-						final String transactionId = arg1.getExtras()
-								.getString("appmart_service_trns_id");
-
-						int res = mService.confirmFinishedTransaction(
-								transactionId, mPurchasingSku, mDeveloperId);
-
-						if (res != BILLING_RESPONSE_RESULT_OK) {
-							result = new AppmartResult(
-									BILLING_CONFIRM_TRANSACTION_FAILED,
-									"ErrorCode:" + res + " (" + transactionId
-											+ ", " + mPurchasingSku + ", "
-											+ mDeveloperId + ")");
+						
+						//決済キー
+						String resultKeyCurrentStransaction= arg1.getExtras().getString("appmart_result_key");				
+						if (resultKeyCurrentStransaction!=null && resultKeyCurrentStransaction.equals(resultKey)){
+							
+							Thread.sleep(1000);
+	
+							// 最終確認
+							final String transactionId = arg1.getExtras()
+									.getString("appmart_service_trns_id");
+	
+							int res = mService.confirmFinishedTransaction(
+									transactionId, mPurchasingSku, mDeveloperId);
+	
+							if (res != BILLING_RESPONSE_RESULT_OK) {
+								result = new AppmartResult(
+										BILLING_CONFIRM_TRANSACTION_FAILED,
+										"ErrorCode:" + res + " (" + transactionId
+												+ ", " + mPurchasingSku + ", "
+												+ mDeveloperId + ")");
+								if (mPurchaseListener != null)
+									mPurchaseListener.onAppmartPurchaseFinished(
+											result, null);
+								return;
+							}
+	
+							String json = mService.getPaymentDetails(transactionId,
+									mPurchasingSku, mDeveloperId);
+							logDebug("Payment details: " + json);
+	
+							Payment payment = new Payment(mPurchasingItemType,
+									mPurchasingSku, json, transactionId);
+							result = new AppmartResult(BILLING_RESPONSE_RESULT_OK,
+									null);
+	
 							if (mPurchaseListener != null)
-								mPurchaseListener.onAppmartPurchaseFinished(
-										result, null);
-							return;
+								mPurchaseListener.onAppmartPurchaseFinished(result,
+										payment);
+						
 						}
-
-						String json = mService.getPaymentDetails(transactionId,
-								mPurchasingSku, mDeveloperId);
-						logDebug("Payment details: " + json);
-
-						Payment payment = new Payment(mPurchasingItemType,
-								mPurchasingSku, json, transactionId);
-						result = new AppmartResult(BILLING_RESPONSE_RESULT_OK,
-								null);
-
-						if (mPurchaseListener != null)
-							mPurchaseListener.onAppmartPurchaseFinished(result,
-									payment);
+					
 					} catch (RemoteException e) {
 						result = new AppmartResult(
 								APPMARTHELPER_REMOTE_EXCEPTION, null);

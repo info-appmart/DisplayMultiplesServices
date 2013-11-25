@@ -10,6 +10,14 @@ Appmartアプリ内課金システムのサンプルコードです。特定ア�
 
 ---
 
+###　パーミッション追加
+
+課金システムを使うには下記パーミッションが必要となります。
+
+```
+<uses-permission android:name="jp.app_mart.permissions.APPMART_BILLING" />
+<uses-permission android:name="android.permission.INTERNET" />
+```
 
 ## 引数の設定
 
