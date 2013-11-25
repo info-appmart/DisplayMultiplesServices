@@ -1,13 +1,19 @@
-# Appmartアプリ内課金システム
+Appmartアプリ内課金システム
+======================
 
-###複数のアイテムを取得方法
+Appmartアプリ内課金システムのサンプルコードです。特定アプリの複数のアイテム情報を取得して、決済可能にするサンプルコードです。
+
+課金サービスとやり取りするためにヘルパークラスが用意されております（AppmartHelper）。
+
+各メッソードの【引数】・【戻り値】 は この[READMEファイル](https://github.com/info-appmart/inBillingSampleOnePage/blob/master/README.md#%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9)をご参照ください。
 
 
-####必要なパラメータの保存場所：
-*src.jp.app_mart.billing.StoreActivity*
+---
 
 
-####パラメータ一覧
+## 引数の設定
+
+下記引数を直してください。 (src.jp.app_mart.billing.StoreActivity.java)
 
 ```
 //デベロッパＩＤ
@@ -21,18 +27,14 @@ APPMART_PUBLIC_KEY = "your_public_key";
 
 //アプリＩＤ
 APPMART_APP_ID = "your_application_id";
+
+//サービスIDS
+private final List<String> allSkuIds = new ArrayList<String>() {
+{
+  add("test-1");
+  add("test-2");
+  add("test-3");
+}
+};
+    
 ```
-
-
-#### 同ファイルのallSkuIds（配列）の中に上記アプリのサービス名を入れる：
-
-```
-   private final List<String> allSkuIds = new ArrayList<String>() {
-        {
-            add("test-1");
-            add("test-2");
-            add("test-3");
-        }
-    };
-```
-
