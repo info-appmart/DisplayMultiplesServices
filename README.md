@@ -5,7 +5,7 @@ Appmartアプリ内課金システムのサンプルコードです。特定ア�
 
 課金サービスとやり取りするためにヘルパークラスが用意されております（AppmartHelper）。
 
-各メッソードの【引数】・【戻り値】 は この[READMEファイル](https://github.com/info-appmart/inBillingSampleOnePage/blob/master/README.md#%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9)をご参照ください。
+各メソッドの【引数】・【戻り値】 は この[READMEファイル](https://github.com/info-appmart/inBillingSampleOnePage/blob/master/README.md#%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9)をご参照ください。
 
 
 ---
